@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>Admin Report — RACE PHASE 2 MCQ</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #04060f;
+            --card: rgba(255, 255, 255, .045);
+            --border: rgba(255, 255, 255, .09);
+            --accent: #7c6ef7;
+            --accent2: #f73c8e;
+            --accent3: #00e5a0;
+            --gold: #ffc857;
+            --danger: #ff4747;
+            --text: #eef0f8;
+            --muted: #6b7899
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 32px 20px
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 60% at 15% 5%, rgba(124, 110, 247, .18) 0%, transparent 65%), radial-gradient(ellipse 60% 50% at 85% 90%, rgba(247, 60, 142, .12) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0
+        }
+
+        .wrap {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 24px
+        }
+
+        /* header */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            padding: 28px 32px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            backdrop-filter: blur(20px)
+        }
+
+        .ph-left h1 {
+            font-size: 20px;
+            font-weight: 800;
+            color: #fff
+        }
+
+        .ph-left p {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 4px
+        }
+
+        .ph-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 14px 5px 6px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(124, 110, 247, .2), rgba(247, 60, 142, .12));
+            border: 1px solid rgba(124, 110, 247, .3);
+            margin-bottom: 10px
+        }
+
+        .ph-chip-dot {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 900;
+            color: #fff
+        }
+
+        .ph-chip span {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, .6)
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 11px 22px;
+            border-radius: 12px;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .btn-fetch {
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            color: #fff;
+            box-shadow: 0 6px 20px rgba(124, 110, 247, .35)
+        }
+
+        .btn-fetch:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(124, 110, 247, .5)
+        }
+
+        .btn-pdf {
+            background: linear-gradient(135deg, #222, #111);
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, .1)
+        }
+
+        .btn-pdf:hover {
+            background: linear-gradient(135deg, #2d2d2d, #1a1a1a);
+            transform: translateY(-2px)
+        }
+
+        .btn-pdf:disabled {
+            opacity: .35;
+            cursor: not-allowed;
+            transform: none
+        }
+
+        /* kpi */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 14px
+        }
+
+        .kpi {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px;
+            backdrop-filter: blur(16px);
+            display: flex;
+            flex-direction: column;
+            gap: 5px
+        }
+
+        .kpi-val {
+            font-size: 28px;
+            font-weight: 900
+        }
+
+        .kpi-lbl {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted)
+        }
+
+        /* section */
+        .section-hdr {
+            font-size: 15px;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .sec-badge {
+            padding: 2px 10px;
+            border-radius: 999px;
+            background: rgba(124, 110, 247, .12);
+            border: 1px solid rgba(124, 110, 247, .2);
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--accent)
+        }
+
+        /* table */
+        .tbl-wrap {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            backdrop-filter: blur(16px)
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse
+        }
+
+        thead tr {
+            background: rgba(124, 110, 247, .1);
+            border-bottom: 1px solid rgba(124, 110, 247, .18)
+        }
+
+        thead th {
+            padding: 11px 14px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+            text-align: left;
+            white-space: nowrap
+        }
+
+        tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, .05);
+            transition: background .12s
+        }
+
+        tbody tr:last-child {
+            border-bottom: none
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, .03)
+        }
+
+        td {
+            padding: 11px 14px;
+            font-size: 13px
+        }
+
+        .rank {
+            font-weight: 800;
+            font-size: 13px;
+            white-space: nowrap
+        }
+
+        .r1 {
+            color: var(--gold)
+        }
+
+        .r2 {
+            color: #c0c0c0
+        }
+
+        .r3 {
+            color: #cd7f32
+        }
+
+        .score-bar-wrap {
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .sb {
+            height: 5px;
+            border-radius: 99px;
+            background: rgba(255, 255, 255, .06);
+            width: 80px
+        }
+
+        .sbf {
+            height: 100%;
+            border-radius: 99px;
+            background: linear-gradient(90deg, var(--accent), var(--accent3))
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .bdc {
+            display: inline-flex;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700
+        }
+
+        .bdc-ok {
+            background: rgba(0, 229, 160, .1);
+            color: var(--accent3);
+            border: 1px solid rgba(0, 229, 160, .18)
+        }
+
+        .bdc-dq {
+            background: rgba(255, 71, 71, .1);
+            color: var(--danger);
+            border: 1px solid rgba(255, 71, 71, .18)
+        }
+
+        .bdc-warn {
+            background: rgba(255, 200, 87, .1);
+            color: var(--gold);
+            border: 1px solid rgba(255, 200, 87, .18)
+        }
+
+        /* loading/empty */
+        .state-msg {
+            text-align: center;
+            padding: 40px;
+            color: var(--muted);
+            font-size: 14px
+        }
+
+        .spin {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(124, 110, 247, .3);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+            vertical-align: middle;
+            margin-right: 8px
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg)
+            }
+        }
+
+        ::-webkit-scrollbar {
+            width: 5px
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, .1);
+            border-radius: 99px
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+
+        <!-- Page Header -->
+        <div class="page-header">
+            <div class="ph-left">
+                <div class="ph-chip">
+                    <div class="ph-chip-dot">R</div><span>R·A·C·E ADMIN</span>
+                </div>
+                <h1>RACE PHASE 2 — MCQ Test Report</h1>
+                <p>Fetch live results from Firebase &amp; export clean B&amp;W PDF</p>
+            </div>
+            <div class="btn-row">
+                <button class="btn btn-fetch" id="btn-fetch">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                        <polyline points="7 10 12 15 17 10" />
+                        <line x1="12" y1="15" x2="12" y2="3" />
+                    </svg>
+                    Fetch Results
+                </button>
+                <button class="btn btn-pdf" id="btn-pdf" disabled>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2.5">
+                        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                        <polyline points="14 2 14 8 20 8" />
+                        <line x1="9" y1="13" x2="15" y2="13" />
+                        <line x1="9" y1="17" x2="15" y2="17" />
+                    </svg>
+                    Download PDF (B&amp;W)
+                </button>
+            </div>
+        </div>
+
+        <!-- KPIs (filled dynamically) -->
+        <div class="kpi-row" id="kpi-row" style="display:none">
+            <div class="kpi"><span class="kpi-val" id="k-total" style="color:var(--accent)">—</span><span
+                    class="kpi-lbl">Participants</span></div>
+            <div class="kpi"><span class="kpi-val" id="k-done" style="color:var(--accent3)">—</span><span
+                    class="kpi-lbl">Completed</span></div>
+            <div class="kpi"><span class="kpi-val" id="k-dq" style="color:var(--danger)">—</span><span
+                    class="kpi-lbl">Disqualified</span></div>
+            <div class="kpi"><span class="kpi-val" id="k-top" style="color:var(--gold)">—</span><span
+                    class="kpi-lbl">Top Score</span></div>
+            <div class="kpi"><span class="kpi-val" id="k-avg" style="color:var(--accent2)">—</span><span
+                    class="kpi-lbl">Avg Score</span></div>
+        </div>
+
+        <!-- Leaderboard table -->
+        <div id="lb-section" style="display:none">
+            <div class="section-hdr" style="margin-bottom:14px">🏆 Leaderboard <span class="sec-badge" id="lb-badge">0
+                    Students</span></div>
+            <div class="tbl-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Reg ID</th>
+                            <th>Score</th>
+                            <th>Accuracy</th>
+                            <th>Time</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="lb-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Violations table -->
+        <div id="viol-section" style="display:none">
+            <div class="section-hdr" style="margin-bottom:14px">⚠️ Violation Log <span class="sec-badge"
+                    id="viol-badge">0 Incidents</span></div>
+            <div class="tbl-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Reg ID</th>
+                            <th>Violation Type</th>
+                            <th>Warning #</th>
+                            <th>Time (UTC)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="viol-body"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="state-msg" class="state-msg">Click <strong>Fetch Results</strong> to load the latest data from
+            Firebase.</div>
+    </div>
+
+    <script>
+        const FB = 'https://qr-databse---upagraha-default-rtdb.asia-southeast1.firebasedatabase.app';
+        const AUTH = 'zvpq2DLFNGFHUq6S7tDVtIYfH4mSauwyJaTsht1p';
+        const LBLS = ['A', 'B', 'C', 'D'];
+
+        let reportData = { leaderboard: [], violations: [], kpi: {} };
+
+        /* ── Fetch ── */
+        document.getElementById('btn-fetch').addEventListener('click', fetchData);
+
+        async function fetchData() {
+            const msg = document.getElementById('state-msg');
+            msg.innerHTML = '<span class="spin"></span>Fetching from Firebase…';
+            msg.style.display = 'block';
+            document.getElementById('btn-pdf').disabled = true;
+
+            try {
+                const res = await fetch(`${FB}/quiz_race_results.json?auth=${AUTH}`);
+                const raw = await res.json();
+                if (!raw) { msg.textContent = 'No data found in database.'; return; }
+                processData(raw);
+                msg.style.display = 'none';
+            } catch (e) {
+                msg.textContent = 'Error fetching data: ' + e.message;
+            }
+        }
+
+        /* ── Process ── */
+        function processData(raw) {
+            const entries = Object.values(raw);
+            const completed = [];
+            const violations = [];
+
+            // Deduplicate — keep best score per regId for completions
+            const bestByReg = {};
+            entries.forEach(e => {
+                if (e.event === 'VIOLATION') { violations.push(e); return; }
+                if (!e.name || !e.score === undefined) return;
+
+                // Skip test user
+                if ((e.regId || '').toUpperCase() === 'Q1234567') return;
+
+                const key = (e.regId || e.name).trim().toLowerCase();
+                if (!bestByReg[key] || e.score > bestByReg[key].score) {
+                    bestByReg[key] = e;
+                }
+            });
+
+            const students = Object.values(bestByReg);
+            students.sort((a, b) => b.score - a.score || (parseSecs(a.timeTaken) - parseSecs(b.timeTaken)));
+
+            const dq = students.filter(s => s.reason === 'disqualified');
+            const done = students.filter(s => s.reason !== 'disqualified');
+            const allValid = students; // both for avg
+            const avg = allValid.length ? (allValid.reduce((s, e) => s + e.score, 0) / allValid.length).toFixed(2) : '—';
+            const topScore = allValid.length ? Math.max(...allValid.map(e => e.score)) : '—';
+
+            reportData = {
+                leaderboard: students, violations, kpi: {
+                    total: students.length, done: done.length, dq: dq.length, top: topScore, avg
+                }
+            };
+
+            renderKPI();
+            renderLeaderboard(students);
+            renderViolations(violations);
+
+            document.getElementById('btn-pdf').disabled = false;
+            document.getElementById('kpi-row').style.display = 'grid';
+        }
+
+        function parseSecs(t) {
+            if (!t) return 9999;
+            const m = t.match(/(\d+)m\s*(\d+)s/);
+            return m ? parseInt(m[1]) * 60 + parseInt(m[2]) : 9999;
+        }
+
+        /* ── Render KPI ── */
+        function renderKPI() {
+            const k = reportData.kpi;
+            document.getElementById('k-total').textContent = k.total;
+            document.getElementById('k-done').textContent = k.done;
+            document.getElementById('k-dq').textContent = k.dq;
+            document.getElementById('k-top').textContent = k.top + '/30';
+            document.getElementById('k-avg').textContent = k.avg;
+        }
+
+        /* ── Render Leaderboard ── */
+        function renderLeaderboard(students) {
+            const body = document.getElementById('lb-body');
+            body.innerHTML = '';
+
+            let rank = 1;
+            students.forEach((s, i) => {
+                if (i > 0 && students[i].score < students[i - 1].score) rank = i + 1;
+                const pct = (s.score / 30 * 100).toFixed(1);
+                const isDQ = s.reason === 'disqualified';
+                const hasViol = s.violations && s.violations.length > 0;
+                let rankLabel = rank;
+                let rankClass = '';
+                if (!isDQ) {
+                    if (rank === 1) { rankLabel = '🥇 1'; rankClass = 'r1'; }
+                    else if (rank === 2 || rank === 3) { rankLabel = `${rank === 2 ? '🥈' : '🥉'} ${rank}`; rankClass = rank === 2 ? 'r2' : 'r3'; }
+                }
+                const statusHtml = isDQ
+                    ? `<span class="bdc bdc-dq">❌ DQ</span>`
+                    : hasViol
+                        ? `<span class="bdc bdc-warn">⚠ ${s.violations.length} Violation</span>`
+                        : `<span class="bdc bdc-ok">✅ Done</span>`;
+
+                body.innerHTML += `<tr>
+      <td class="rank ${rankClass}">${isDQ ? '—' : rankLabel}</td>
+      <td><strong>${s.name}</strong></td>
+      <td class="mono">${s.regId || '—'}</td>
+      <td><div class="score-bar-wrap"><strong>${s.score}</strong>/30 <div class="sb"><div class="sbf" style="width:${s.score / 30 * 100}%"></div></div></div></td>
+      <td>${pct}%</td>
+      <td class="mono">${s.timeTaken || '—'}</td>
+      <td>${statusHtml}</td>
+    </tr>`;
+            });
+
+            document.getElementById('lb-badge').textContent = students.length + ' Students';
+            document.getElementById('lb-section').style.display = 'block';
+        }
+
+        /* ── Render Violations ── */
+        function renderViolations(viols) {
+            const body = document.getElementById('viol-body');
+            body.innerHTML = '';
+            viols.sort((a, b) => new Date(a.time) - new Date(b.time));
+            viols.forEach(v => {
+                const t = new Date(v.time);
+                const timeStr = t.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' IST';
+                body.innerHTML += `<tr>
+      <td><strong>${v.name || '—'}</strong></td>
+      <td class="mono">${v.regId || '—'}</td>
+      <td style="color:var(--danger)">${v.type || '—'}</td>
+      <td style="text-align:center">#${v.warnNum || '?'}</td>
+      <td class="mono">${timeStr}</td>
+    </tr>`;
+            });
+
+            document.getElementById('viol-badge').textContent = viols.length + ' Incidents';
+            document.getElementById('viol-section').style.display = viols.length ? 'block' : 'none';
+        }
+
+        /* ── PDF Export (B&W, clean table) ── */
+        document.getElementById('btn-pdf').addEventListener('click', exportPDF);
+
+        function exportPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+            const W = doc.internal.pageSize.getWidth();
+            const pageH = doc.internal.pageSize.getHeight();
+            let y = 18;
+
+            // ── Header ──────────────────────────────────
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(16);
+            doc.setTextColor(0);
+            doc.text('RACE PHASE 2 — SESSION MCQ TEST', W / 2, y, { align: 'center' });
+            y += 6;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(80);
+            doc.text('VLSI & IC Basics · 30 Questions · 20 Minutes', W / 2, y, { align: 'center' });
+            y += 4;
+            const now = new Date();
+            const dtStr = now.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false }) + ' IST';
+            doc.text(`Report Generated: ${dtStr}`, W / 2, y, { align: 'center' });
+            y += 5;
+
+            // Divider
+            doc.setDrawColor(0); doc.setLineWidth(0.4);
+            doc.line(14, y, W - 14, y);
+            y += 7;
+
+            // ── KPI Summary ──────────────────────────────
+            const k = reportData.kpi;
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(0);
+            doc.text('SUMMARY', 14, y); y += 5;
+
+            const kpiData = [
+                ['Total Participants', k.total, 'Completed', k.done, 'Disqualified', k.dq],
+                ['Top Score', k.top + '/30', 'Average Score', k.avg + '/30', '', ''],
+            ];
+            doc.autoTable({
+                startY: y,
+                head: [],
+                body: kpiData,
+                theme: 'grid',
+                styles: { font: 'helvetica', fontSize: 10, textColor: 0, fillColor: 255, lineColor: 180, lineWidth: 0.3 },
+                columnStyles: {
+                    0: { fontStyle: 'bold', cellWidth: 38 }, 1: { cellWidth: 22 },
+                    2: { fontStyle: 'bold', cellWidth: 38 }, 3: { cellWidth: 22 },
+                    4: { fontStyle: 'bold', cellWidth: 38 }, 5: { cellWidth: 22 },
+                },
+                margin: { left: 14, right: 14 },
+            });
+            y = doc.lastAutoTable.finalY + 8;
+
+            // ── Leaderboard ──────────────────────────────
+            doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(0);
+            doc.text('LEADERBOARD — RANKED BY SCORE', 14, y); y += 5;
+
+            const students = reportData.leaderboard;
+            let rank = 1;
+            const lbRows = students.map((s, i) => {
+                if (i > 0 && students[i].score < students[i - 1].score) rank = i + 1;
+                const isDQ = s.reason === 'disqualified';
+                const pct = (s.score / 30 * 100).toFixed(1) + '%';
+                const hasV = s.violations && s.violations.length > 0;
+                const status = isDQ ? 'DISQUALIFIED' : hasV ? `WARNING (${s.violations.length})` : 'Completed';
+                const rankStr = isDQ ? 'DQ' : String(rank);
+                if (!isDQ) rank;
+                return [rankStr, s.name, s.regId || '—', `${s.score}/30`, pct, s.timeTaken || '—', status];
+            });
+
+            doc.autoTable({
+                startY: y,
+                head: [['#', 'Name', 'Reg ID', 'Score', 'Accuracy', 'Time', 'Status']],
+                body: lbRows,
+                theme: 'striped',
+                styles: { font: 'helvetica', fontSize: 8.5, textColor: 0, fillColor: 255, lineColor: 200, lineWidth: 0.25 },
+                headStyles: { fontStyle: 'bold', fillColor: 220, textColor: 0, lineColor: 160 },
+                alternateRowStyles: { fillColor: 245 },
+                columnStyles: {
+                    0: { cellWidth: 10, halign: 'center' },
+                    1: { cellWidth: 48 },
+                    2: { cellWidth: 30, font: 'courier', fontSize: 8 },
+                    3: { cellWidth: 16, halign: 'center' },
+                    4: { cellWidth: 18, halign: 'center' },
+                    5: { cellWidth: 18, halign: 'center', font: 'courier', fontSize: 8 },
+                    6: { cellWidth: 28, halign: 'center' },
+                },
+                didParseCell(data) {
+                    if (data.section === 'body') {
+                        const status = data.row.raw[6];
+                        if (status === 'DISQUALIFIED') data.cell.styles.textColor = [180, 0, 0];
+                        if (status && status.startsWith('WARNING')) data.cell.styles.textColor = [140, 100, 0];
+                    }
+                },
+                margin: { left: 14, right: 14 },
+            });
+            y = doc.lastAutoTable.finalY + 8;
+
+            // ── Violation Log ─────────────────────────────
+            const viols = reportData.violations;
+            if (viols.length > 0) {
+                // new page if < 40mm left
+                if (y > pageH - 60) { doc.addPage(); y = 18; }
+
+                doc.setFont('helvetica', 'bold'); doc.setFontSize(11); doc.setTextColor(0);
+                doc.text('VIOLATION LOG', 14, y); y += 5;
+
+                const violRows = [...viols].sort((a, b) => new Date(a.time) - new Date(b.time)).map(v => {
+                    const t = new Date(v.time);
+                    const ts = t.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }) + ' IST';
+                    return [v.name || '—', v.regId || '—', v.type || '—', '#' + (v.warnNum || '?'), ts];
+                });
+
+                doc.autoTable({
+                    startY: y,
+                    head: [['Name', 'Reg ID', 'Violation Type', 'Warn #', 'Time (IST)']],
+                    body: violRows,
+                    theme: 'striped',
+                    styles: { font: 'helvetica', fontSize: 8.5, textColor: 0, fillColor: 255, lineColor: 200, lineWidth: 0.25 },
+                    headStyles: { fontStyle: 'bold', fillColor: 220, textColor: 0, lineColor: 160 },
+                    alternateRowStyles: { fillColor: 245 },
+                    columnStyles: {
+                        0: { cellWidth: 46 }, 1: { cellWidth: 30, font: 'courier', fontSize: 8 },
+                        2: { cellWidth: 46 }, 3: { cellWidth: 16, halign: 'center' },
+                        4: { cellWidth: 26, font: 'courier', fontSize: 8 },
+                    },
+                    didParseCell(data) {
+                        if (data.section === 'body') data.cell.styles.textColor = [160, 0, 0];
+                    },
+                    margin: { left: 14, right: 14 },
+                });
+                y = doc.lastAutoTable.finalY + 8;
+            }
+
+            // ── Footer on each page ───────────────────────
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let p = 1; p <= totalPages; p++) {
+                doc.setPage(p);
+                doc.setFont('helvetica', 'normal'); doc.setFontSize(8); doc.setTextColor(130);
+                doc.text('RACE PHASE 2 SESSION MCQ TEST — Confidential Report', 14, pageH - 8);
+                doc.text(`Page ${p} of ${totalPages}`, W - 14, pageH - 8, { align: 'right' });
+                // top border
+                doc.setDrawColor(0); doc.setLineWidth(0.3);
+                doc.line(14, 12, W - 14, 12);
+                doc.setFontSize(7); doc.setTextColor(160);
+                doc.text('RACE PHASE 2 — SESSION MCQ TEST', W / 2, 9, { align: 'center' });
+            }
+
+            doc.save('RACE_Phase2_MCQ_Report.pdf');
+        }
+    </script>
+</body>
+
+</html>

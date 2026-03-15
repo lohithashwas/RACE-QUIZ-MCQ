@@ -1,0 +1,1636 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>RACE PHASE 2 — SESSION MCQ TEST</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #04060f;
+            --surface: #0b0f1e;
+            --card: rgba(255, 255, 255, .045);
+            --border: rgba(255, 255, 255, .09);
+            --accent: #7c6ef7;
+            --accent2: #f73c8e;
+            --accent3: #00e5a0;
+            --gold: #ffc857;
+            --danger: #ff4747;
+            --text: #eef0f8;
+            --muted: #6b7899;
+            --r: 18px;
+            --ease: cubic-bezier(.4, 0, .2, 1);
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        html {
+            height: 100%;
+            scroll-behavior: smooth
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            overflow-x: hidden;
+            user-select: none;
+            -webkit-user-select: none
+        }
+
+        #canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none
+        }
+
+        .mesh {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+            background: radial-gradient(ellipse 90% 70% at 15% 5%, rgba(124, 110, 247, .22) 0%, transparent 65%),
+                radial-gradient(ellipse 70% 60% at 85% 90%, rgba(247, 60, 142, .15) 0%, transparent 60%)
+        }
+
+        /* ── Screen system ── */
+        .screen {
+            position: relative;
+            z-index: 1;
+            display: none;
+            min-height: 100vh
+        }
+
+        .screen.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column
+        }
+
+        .screen.hidden {
+            display: none !important
+        }
+
+        .overlay-screen {
+            position: fixed;
+            inset: 0;
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(12px) saturate(1.5);
+            background: rgba(4, 6, 15, .7)
+        }
+
+        .overlay-screen.active {
+            display: flex
+        }
+
+        /* ── Glass ── */
+        .glass {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--r);
+            backdrop-filter: blur(24px) saturate(1.6);
+            -webkit-backdrop-filter: blur(24px)
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(.88)
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1)
+            }
+        }
+
+        @keyframes floatY {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-8px)
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: .6
+            }
+        }
+
+        @keyframes glow {
+
+            0%,
+            100% {
+                text-shadow: 0 0 10px rgba(124, 110, 247, .4)
+            }
+
+            50% {
+                text-shadow: 0 0 30px rgba(124, 110, 247, .9), 0 0 60px rgba(124, 110, 247, .4)
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px)
+            }
+
+            to {
+                opacity: 1;
+                transform: none
+            }
+        }
+
+        /* ══════════ LANDING ══════════ */
+        #screen-landing {
+            padding: 20px
+        }
+
+        .landing-card {
+            width: min(540px, 95vw);
+            padding: 52px 48px;
+            animation: fadeUp .6s var(--ease);
+            display: flex;
+            flex-direction: column;
+            gap: 22px
+        }
+
+        .race-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            width: fit-content;
+            padding: 6px 18px 6px 6px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(124, 110, 247, .25), rgba(247, 60, 142, .15));
+            border: 1px solid rgba(124, 110, 247, .35)
+        }
+
+        .race-badge-dot {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 900;
+            color: #fff
+        }
+
+        .race-badge span {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: rgba(255, 255, 255, .7)
+        }
+
+        .quiz-title {
+            font-size: clamp(26px, 5vw, 40px);
+            font-weight: 900;
+            line-height: 1.1;
+            color: #fff
+        }
+
+        .quiz-title .gtext {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 60%, var(--gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: glow 3s ease infinite
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: var(--muted);
+            letter-spacing: .5px
+        }
+
+        .rules-box {
+            background: rgba(255, 71, 71, .06);
+            border: 1px solid rgba(255, 71, 71, .15);
+            border-radius: 14px;
+            padding: 18px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 9px
+        }
+
+        .rules-box p {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255, 120, 120, .7);
+            margin-bottom: 4px
+        }
+
+        .rule-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: rgba(255, 255, 255, .65);
+            line-height: 1.4
+        }
+
+        .rule-icon {
+            width: 22px;
+            height: 22px;
+            border-radius: 6px;
+            background: rgba(255, 71, 71, .15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            flex-shrink: 0
+        }
+
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 7px
+        }
+
+        .field-label {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--muted)
+        }
+
+        .field-input {
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 13px 16px;
+            font-size: 15px;
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color .2s, box-shadow .2s, background .2s
+        }
+
+        .field-input:focus {
+            border-color: var(--accent);
+            background: rgba(124, 110, 247, .08);
+            box-shadow: 0 0 0 4px rgba(124, 110, 247, .12)
+        }
+
+        .field-input::placeholder {
+            color: rgba(107, 120, 153, .7)
+        }
+
+        .btn-primary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 28px;
+            border-radius: 14px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            box-shadow: 0 8px 30px rgba(124, 110, 247, .4);
+            transition: all .22s var(--ease);
+            position: relative;
+            overflow: hidden
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .15), transparent);
+            transform: translateX(-100%);
+            transition: transform .5s
+        }
+
+        .btn-primary:hover::before {
+            transform: translateX(100%)
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 40px rgba(124, 110, 247, .55)
+        }
+
+        .btn-primary:active {
+            transform: scale(.97)
+        }
+
+        .note {
+            font-size: 11px;
+            color: var(--muted);
+            text-align: center
+        }
+
+        /* ══════════ QUIZ SCREEN ══════════ */
+        #screen-quiz {
+            display: none;
+            flex-direction: column;
+            align-items: stretch;
+            padding: 0;
+            min-height: 100vh
+        }
+
+        #screen-quiz.active {
+            display: flex;
+            justify-content: flex-start
+        }
+
+        .qhdr {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 28px;
+            background: rgba(11, 15, 30, .9);
+            border-bottom: 1px solid var(--border);
+            backdrop-filter: blur(30px);
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            flex-wrap: wrap;
+            gap: 10px
+        }
+
+        .qhdr-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .qhdr-chip {
+            padding: 5px 14px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, var(--accent), var(--accent2));
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 3px;
+            color: #fff
+        }
+
+        .qhdr-title {
+            font-size: 13px;
+            font-weight: 700;
+            opacity: .8
+        }
+
+        .qhdr-meta {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap
+        }
+
+        .meta-chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid var(--border);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--muted)
+        }
+
+        .meta-chip.timer-chip {
+            color: var(--gold);
+            border-color: rgba(255, 200, 87, .2);
+            background: rgba(255, 200, 87, .07);
+            animation: pulse 2s infinite
+        }
+
+        .meta-chip.timer-chip.low {
+            color: var(--danger);
+            border-color: rgba(255, 71, 71, .3);
+            background: rgba(255, 71, 71, .08)
+        }
+
+        .timer-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--gold);
+            animation: pulse 1s infinite
+        }
+
+        .timer-dot.low {
+            background: var(--danger)
+        }
+
+        .progress-track {
+            height: 3px;
+            background: rgba(255, 255, 255, .06)
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent), var(--accent2), var(--gold));
+            transition: width .5s var(--ease);
+            position: relative
+        }
+
+        .progress-fill::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #fff;
+            box-shadow: 0 0 10px var(--accent);
+            margin-right: -5px
+        }
+
+        .quiz-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 32px 24px;
+            gap: 28px;
+            max-width: 760px;
+            width: 100%;
+            margin: 0 auto
+        }
+
+        .qcard {
+            padding: 36px;
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            animation: fadeUp .3s var(--ease);
+            position: relative;
+            overflow: hidden
+        }
+
+        .qcard::before {
+            content: '';
+            position: absolute;
+            top: -80px;
+            right: -80px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(124, 110, 247, .08), transparent 70%);
+            pointer-events: none
+        }
+
+        .q-cat {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: rgba(124, 110, 247, .12);
+            border: 1px solid rgba(124, 110, 247, .2);
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--accent);
+            width: fit-content
+        }
+
+        .q-num {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--muted);
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .q-text {
+            font-size: clamp(16px, 2.5vw, 20px);
+            font-weight: 700;
+            line-height: 1.6;
+            color: #fff
+        }
+
+        .opts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px
+        }
+
+        @media(max-width:520px) {
+            .opts-grid {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .opt {
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 15px 18px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text);
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all .18s var(--ease);
+            position: relative;
+            overflow: hidden
+        }
+
+        .opt::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(124, 110, 247, .1), rgba(247, 60, 142, .07));
+            opacity: 0;
+            transition: opacity .2s
+        }
+
+        .opt:hover:not(:disabled)::before {
+            opacity: 1
+        }
+
+        .opt:hover:not(:disabled) {
+            border-color: rgba(124, 110, 247, .4);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(124, 110, 247, .15)
+        }
+
+        .opt:disabled {
+            cursor: default
+        }
+
+        .opt-lbl {
+            width: 30px;
+            height: 30px;
+            border-radius: 9px;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, .07);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            color: var(--muted);
+            transition: all .18s;
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .opt:hover:not(:disabled) .opt-lbl {
+            background: rgba(124, 110, 247, .2);
+            color: var(--accent)
+        }
+
+        .opt.selected {
+            border-color: var(--accent);
+            background: rgba(124, 110, 247, .1)
+        }
+
+        .opt.selected .opt-lbl {
+            background: var(--accent);
+            color: #fff
+        }
+
+        .opt.correct {
+            border-color: var(--accent3);
+            background: rgba(0, 229, 160, .09)
+        }
+
+        .opt.correct .opt-lbl {
+            background: var(--accent3);
+            color: #012b1e
+        }
+
+        .opt.wrong {
+            border-color: var(--danger);
+            background: rgba(255, 71, 71, .09)
+        }
+
+        .opt.wrong .opt-lbl {
+            background: var(--danger);
+            color: #fff
+        }
+
+        .btn-next {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 15px 44px;
+            border-radius: 14px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: #011a12;
+            background: linear-gradient(135deg, var(--accent3), #00c9a7);
+            box-shadow: 0 8px 28px rgba(0, 229, 160, .3);
+            transition: all .22s var(--ease);
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden
+        }
+
+        .btn-next:hover:not(:disabled) {
+            transform: translateY(-3px);
+            box-shadow: 0 14px 36px rgba(0, 229, 160, .45)
+        }
+
+        .btn-next:active:not(:disabled) {
+            transform: scale(.97)
+        }
+
+        .btn-next:disabled {
+            opacity: .3;
+            cursor: not-allowed
+        }
+
+        /* ══════════ OVERLAYS ══════════ */
+        .ov-card {
+            width: min(440px, 92vw);
+            padding: 44px 40px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 18px;
+            animation: popIn .3s var(--ease)
+        }
+
+        .ov-icon {
+            font-size: 60px;
+            animation: floatY 2s ease infinite
+        }
+
+        .ov-card h2 {
+            font-size: 26px;
+            font-weight: 800
+        }
+
+        .ov-card p {
+            font-size: 14px;
+            color: var(--muted);
+            line-height: 1.7;
+            max-width: 320px
+        }
+
+        .warn-card {
+            border-color: rgba(255, 200, 87, .2) !important;
+            background: rgba(255, 200, 87, .04) !important
+        }
+
+        .warn-card h2 {
+            color: var(--gold)
+        }
+
+        .dq-card {
+            border-color: rgba(255, 71, 71, .2) !important;
+            background: rgba(255, 71, 71, .04) !important
+        }
+
+        .dq-card h2 {
+            color: var(--danger)
+        }
+
+        .btn-warn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 13px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #1a0c00;
+            background: linear-gradient(135deg, var(--gold), #ff8c00);
+            transition: all .2s
+        }
+
+        .btn-warn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px)
+        }
+
+        /* ══════════ RESULT SCREEN ══════════ */
+        #screen-result {
+            padding: 32px 20px;
+            align-items: center
+        }
+
+        #screen-result.active {
+            display: flex;
+            justify-content: flex-start;
+            overflow-y: auto
+        }
+
+        .result-wrap {
+            width: min(780px, 100%);
+            display: flex;
+            flex-direction: column;
+            gap: 28px;
+            padding-bottom: 60px
+        }
+
+        /* Score card */
+        .result-card {
+            padding: 44px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 22px;
+            animation: fadeUp .6s var(--ease)
+        }
+
+        .trophy {
+            font-size: 64px;
+            animation: floatY 3s ease infinite
+        }
+
+        .result-title {
+            font-size: 28px;
+            font-weight: 900;
+            color: #fff
+        }
+
+        .result-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--muted)
+        }
+
+        .ring-wrap {
+            position: relative;
+            width: 150px;
+            height: 150px
+        }
+
+        .ring-svg {
+            transform: rotate(-90deg);
+            width: 150px;
+            height: 150px
+        }
+
+        .ring-track {
+            fill: none;
+            stroke: rgba(255, 255, 255, .06);
+            stroke-width: 12
+        }
+
+        .ring-arc {
+            fill: none;
+            stroke-width: 12;
+            stroke-dasharray: 452;
+            stroke-dashoffset: 452;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1.2s cubic-bezier(.34, 1.56, .64, 1)
+        }
+
+        .ring-center {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center
+        }
+
+        .ring-score {
+            font-size: 38px;
+            font-weight: 900;
+            color: #fff;
+            line-height: 1
+        }
+
+        .ring-max {
+            font-size: 14px;
+            color: var(--muted)
+        }
+
+        .stats-row {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            justify-content: center
+        }
+
+        .stat-chip {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 14px 20px;
+            border-radius: 14px;
+            min-width: 90px
+        }
+
+        .stat-num {
+            font-size: 22px;
+            font-weight: 800
+        }
+
+        .stat-lbl {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted)
+        }
+
+        .stat-correct {
+            background: rgba(0, 229, 160, .08);
+            border: 1px solid rgba(0, 229, 160, .15)
+        }
+
+        .stat-correct .stat-num {
+            color: var(--accent3)
+        }
+
+        .stat-wrong {
+            background: rgba(255, 71, 71, .08);
+            border: 1px solid rgba(255, 71, 71, .15)
+        }
+
+        .stat-wrong .stat-num {
+            color: var(--danger)
+        }
+
+        .stat-acc {
+            background: rgba(124, 110, 247, .08);
+            border: 1px solid rgba(124, 110, 247, .2)
+        }
+
+        .stat-acc .stat-num {
+            color: var(--accent)
+        }
+
+        .stat-time {
+            background: rgba(255, 200, 87, .07);
+            border: 1px solid rgba(255, 200, 87, .15)
+        }
+
+        .stat-time .stat-num {
+            font-size: 16px;
+            color: var(--gold)
+        }
+
+        .result-saved {
+            font-size: 12px;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 6px
+        }
+
+        .saved-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--accent3);
+            animation: pulse 1.5s infinite
+        }
+
+        /* ══════════ REVIEW SECTION ══════════ */
+        .review-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px
+        }
+
+        .review-title {
+            font-size: 18px;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .review-badge {
+            padding: 4px 12px;
+            border-radius: 999px;
+            background: rgba(124, 110, 247, .12);
+            border: 1px solid rgba(124, 110, 247, .2);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent)
+        }
+
+        .review-legend {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            flex-wrap: wrap
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 3px
+        }
+
+        .legend-dot.c {
+            background: var(--accent3)
+        }
+
+        .legend-dot.w {
+            background: var(--danger)
+        }
+
+        .legend-dot.s {
+            background: var(--accent)
+        }
+
+        /* Review list */
+        .review-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px
+        }
+
+        .rq-card {
+            padding: 22px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            animation: slideIn .4s var(--ease) both
+        }
+
+        .rq-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap
+        }
+
+        .rq-cat {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--muted)
+        }
+
+        .rq-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--muted)
+        }
+
+        .rq-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700
+        }
+
+        .rq-status.correct {
+            background: rgba(0, 229, 160, .12);
+            color: var(--accent3);
+            border: 1px solid rgba(0, 229, 160, .2)
+        }
+
+        .rq-status.wrong {
+            background: rgba(255, 71, 71, .1);
+            color: var(--danger);
+            border: 1px solid rgba(255, 71, 71, .2)
+        }
+
+        .rq-status.skipped {
+            background: rgba(107, 120, 153, .1);
+            color: var(--muted);
+            border: 1px solid rgba(107, 120, 153, .2)
+        }
+
+        .rq-question {
+            font-size: 15px;
+            font-weight: 600;
+            color: #fff;
+            line-height: 1.55
+        }
+
+        .rq-opts {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px
+        }
+
+        @media(max-width:520px) {
+            .rq-opts {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .rq-opt {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 11px;
+            font-size: 13px;
+            font-weight: 500;
+            border: 1px solid transparent
+        }
+
+        .rq-opt.neutral {
+            background: rgba(255, 255, 255, .03);
+            border-color: rgba(255, 255, 255, .06);
+            color: rgba(255, 255, 255, .4)
+        }
+
+        .rq-opt.is-correct {
+            background: rgba(0, 229, 160, .09);
+            border-color: rgba(0, 229, 160, .25);
+            color: var(--accent3)
+        }
+
+        .rq-opt.is-wrong {
+            background: rgba(255, 71, 71, .09);
+            border-color: rgba(255, 71, 71, .25);
+            color: var(--danger)
+        }
+
+        .rq-opt.is-user-selected {
+            border-color: rgba(124, 110, 247, .35);
+            background: rgba(124, 110, 247, .08);
+            color: var(--accent)
+        }
+
+        .rq-lbl {
+            width: 24px;
+            height: 24px;
+            border-radius: 7px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            font-weight: 800;
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(255, 255, 255, .07);
+            color: var(--muted)
+        }
+
+        .rq-opt.is-correct .rq-lbl {
+            background: var(--accent3);
+            color: #012b1e
+        }
+
+        .rq-opt.is-wrong .rq-lbl {
+            background: var(--danger);
+            color: #fff
+        }
+
+        .rq-opt.is-user-selected.is-correct .rq-lbl {
+            background: var(--accent3);
+            color: #012b1e
+        }
+
+        .rq-opt.is-user-selected:not(.is-correct) .rq-lbl {
+            background: var(--danger);
+            color: #fff
+        }
+
+        .rq-footer {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        .rq-footer strong {
+            color: #fff
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, .1);
+            border-radius: 99px
+        }
+
+        /* SVG gradient defs */
+        #ring-defs {
+            position: absolute;
+            width: 0;
+            height: 0;
+            overflow: hidden
+        }
+    </style>
+</head>
+
+<body oncontextmenu="return false;" onselectstart="return false;" oncopy="return false;" oncut="return false;"
+    onpaste="return false;">
+
+    <canvas id="canvas"></canvas>
+    <div class="mesh"></div>
+
+    <svg id="ring-defs">
+        <defs>
+            <linearGradient id="ring-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#7c6ef7" />
+                <stop offset="100%" stop-color="#00e5a0" />
+            </linearGradient>
+            <linearGradient id="ring-grad-warn" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#ffc857" />
+                <stop offset="100%" stop-color="#ff4747" />
+            </linearGradient>
+        </defs>
+    </svg>
+
+    <!-- ════ LANDING ════ -->
+    <div id="screen-landing" class="screen active">
+        <div class="glass landing-card">
+            <div class="race-badge">
+                <div class="race-badge-dot">R</div>
+                <span>R·A·C·E PROGRAM</span>
+            </div>
+            <div>
+                <h1 class="quiz-title">RACE PHASE 2<br /><span class="gtext">SESSION MCQ TEST</span></h1>
+                <p class="subtitle" style="margin-top:8px">VLSI &amp; IC Basics · 30 Questions · 20 Minutes</p>
+            </div>
+            <div class="rules-box">
+                <p>⚠ Examination Rules</p>
+                <div class="rule-item">
+                    <div class="rule-icon">🚫</div>Tab switching is monitored &amp; logged
+                </div>
+                <div class="rule-item">
+                    <div class="rule-icon">🔒</div>Text selection, copy &amp; paste disabled
+                </div>
+                <div class="rule-item">
+                    <div class="rule-icon">🖥</div>Fullscreen is mandatory throughout
+                </div>
+                <div class="rule-item">
+                    <div class="rule-icon">📡</div>All violations sent to server in real-time
+                </div>
+                <div class="rule-item">
+                    <div class="rule-icon">❌</div>2 violations = immediate disqualification
+                </div>
+            </div>
+            <div class="field-group">
+                <label class="field-label">Full Name</label>
+                <input class="field-input" id="inp-name" type="text" placeholder="Enter your full name"
+                    autocomplete="off" spellcheck="false" />
+            </div>
+            <div class="field-group">
+                <label class="field-label">Register Number / ID</label>
+                <input class="field-input" id="inp-id" type="text" placeholder="e.g. 22IT001" autocomplete="off"
+                    spellcheck="false" />
+            </div>
+            <button class="btn-primary" id="btn-start">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M8 6.82v10.36c0 .79.87 1.27 1.54.84l8.14-5.18c.62-.39.62-1.29 0-1.69L9.54 5.98C8.87 5.55 8 6.03 8 6.82z" />
+                </svg>
+                Begin Test — Enter Fullscreen
+            </button>
+            <p class="note">Your results will be securely stored in the database</p>
+        </div>
+    </div>
+
+    <!-- ════ QUIZ ════ -->
+    <div id="screen-quiz" class="screen hidden">
+        <header class="qhdr">
+            <div class="qhdr-brand">
+                <span class="qhdr-chip">R·A·C·E</span>
+                <span class="qhdr-title">PHASE 2 MCQ TEST</span>
+            </div>
+            <div class="qhdr-meta">
+                <div class="meta-chip" id="hdr-user">👤 —</div>
+                <div class="meta-chip" id="hdr-qcount">Q 1 / 30</div>
+                <div class="meta-chip timer-chip" id="hdr-timer">
+                    <div class="timer-dot" id="tdot"></div><span id="tval">20:00</span>
+                </div>
+            </div>
+        </header>
+        <div class="progress-track">
+            <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+        </div>
+        <main class="quiz-body">
+            <div class="glass qcard" id="qcard">
+                <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+                    <span class="q-cat" id="q-cat">Category</span>
+                    <span class="q-num" id="q-num">01 / 30</span>
+                </div>
+                <h2 class="q-text" id="q-text">Loading...</h2>
+                <div class="opts-grid" id="opts-grid"></div>
+            </div>
+            <button class="btn-next" id="btn-next" disabled>
+                Next Question
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z" />
+                </svg>
+            </button>
+        </main>
+    </div>
+
+    <!-- ════ WARNING ════ -->
+    <div id="screen-warning" class="overlay-screen hidden">
+        <div class="glass ov-card warn-card">
+            <div class="ov-icon">⚠️</div>
+            <h2>Warning Issued</h2>
+            <p id="warn-msg">Violation detected. This has been logged. One more violation will disqualify you
+                immediately.</p>
+            <button class="btn-warn" id="btn-resume">I Understand — Resume Test</button>
+        </div>
+    </div>
+
+    <!-- ════ DISQUALIFIED ════ -->
+    <div id="screen-dq" class="overlay-screen hidden">
+        <div class="glass ov-card dq-card">
+            <div class="ov-icon">❌</div>
+            <h2>Disqualified</h2>
+            <p>You have committed two integrity violations. Your submission has been recorded and flagged in the system.
+            </p>
+        </div>
+    </div>
+
+    <!-- ════ RESULT ════ -->
+    <div id="screen-result" class="screen hidden">
+        <div class="result-wrap">
+
+            <!-- Score Summary -->
+            <div class="glass result-card">
+                <div class="trophy" id="r-trophy">🏆</div>
+                <div>
+                    <h2 class="result-title" id="r-title">Test Completed!</h2>
+                    <p class="result-name" id="r-name">—</p>
+                </div>
+                <div class="ring-wrap">
+                    <svg class="ring-svg" viewBox="0 0 150 150">
+                        <circle class="ring-track" cx="75" cy="75" r="60" />
+                        <circle class="ring-arc" id="ring-arc" cx="75" cy="75" r="60" stroke="url(#ring-grad)" />
+                    </svg>
+                    <div class="ring-center">
+                        <span class="ring-score" id="r-score">0</span>
+                        <span class="ring-max">/30</span>
+                    </div>
+                </div>
+                <div class="stats-row">
+                    <div class="stat-chip stat-correct"><span class="stat-num" id="s-correct">0</span><span
+                            class="stat-lbl">Correct</span></div>
+                    <div class="stat-chip stat-wrong"><span class="stat-num" id="s-wrong">0</span><span
+                            class="stat-lbl">Wrong</span></div>
+                    <div class="stat-chip stat-acc"><span class="stat-num" id="s-acc">0%</span><span
+                            class="stat-lbl">Accuracy</span></div>
+                    <div class="stat-chip stat-time"><span class="stat-num" id="s-time">—</span><span
+                            class="stat-lbl">Time Taken</span></div>
+                </div>
+                <div class="result-saved">
+                    <div class="saved-dot"></div>Result securely saved to database
+                </div>
+            </div>
+
+            <!-- Answer Review -->
+            <div>
+                <div class="review-header" style="margin-bottom:18px">
+                    <div class="review-title">
+                        📋 Answer Review
+                        <span class="review-badge" id="rev-badge">30 Questions</span>
+                    </div>
+                    <div class="review-legend">
+                        <div class="legend-item">
+                            <div class="legend-dot c"></div>Correct
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot w"></div>Wrong
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-dot s"></div>Your Answer
+                        </div>
+                    </div>
+                </div>
+                <div class="review-list" id="review-list"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        /* ── Particle bg ── */
+        (() => {
+            const c = document.getElementById('canvas'), ctx = c.getContext('2d');
+            let W, H, pts = []; const N = 80, CON = 110;
+            function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight }
+            resize(); window.addEventListener('resize', resize);
+            for (let i = 0; i < N; i++)pts.push({ x: Math.random() * W, y: Math.random() * H, vx: (Math.random() - .5) * .3, vy: (Math.random() - .5) * .3, r: Math.random() * 1.5 + .5, o: Math.random() * .6 + .3 });
+            function draw() {
+                ctx.clearRect(0, 0, W, H);
+                for (let i = 0; i < N; i++) {
+                    const p = pts[i]; p.x += p.vx; p.y += p.vy;
+                    if (p.x < 0 || p.x > W) p.vx *= -1; if (p.y < 0 || p.y > H) p.vy *= -1;
+                    ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(124,110,247,${p.o * .45})`; ctx.fill();
+                    for (let j = i + 1; j < N; j++) {
+                        const q = pts[j], dx = p.x - q.x, dy = p.y - q.y, d = Math.sqrt(dx * dx + dy * dy);
+                        if (d < CON) {
+                            ctx.beginPath(); ctx.moveTo(p.x, p.y); ctx.lineTo(q.x, q.y);
+                            ctx.strokeStyle = `rgba(124,110,247,${(1 - d / CON) * .1})`; ctx.lineWidth = .7; ctx.stroke()
+                        }
+                    }
+                }
+                requestAnimationFrame(draw);
+            }
+            draw();
+        })();
+
+        /* ── Firebase ── */
+        const FB = 'https://qr-databse---upagraha-default-rtdb.asia-southeast1.firebasedatabase.app';
+        const FB_AUTH = 'zvpq2DLFNGFHUq6S7tDVtIYfH4mSauwyJaTsht1p';
+        function pushFB(data) { fetch(`${FB}/quiz_race_results.json?auth=${FB_AUTH}`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }).catch(() => { }) }
+
+        /* ── Questions ── */
+        const QS = [
+            { cat: "VLSI & IC Basics", q: "VLSI stands for", o: ["Very Large System Integration", "Very Large Scale Integration", "Very Low Scale Integration", "Variable Large Scale Integration"], a: 1 },
+            { cat: "VLSI & IC Basics", q: "An Integrated Circuit (IC) is", o: ["A single logic gate", "A discrete component", "A complete circuit fabricated on a single chip", "A PCB"], a: 2 },
+            { cat: "VLSI & IC Basics", q: "Which of the following is an advantage of ICs?", o: ["Large size", "High power consumption", "High reliability", "Complex wiring"], a: 2 },
+            { cat: "VLSI & IC Basics", q: "The packing density of components is highest in", o: ["SSI", "MSI", "LSI", "VLSI"], a: 3 },
+            { cat: "CMOS Technology", q: "CMOS technology uses", o: ["Only NMOS", "Only PMOS", "Both NMOS and PMOS", "Bipolar transistors"], a: 2 },
+            { cat: "CMOS Technology", q: "The main advantage of CMOS technology is", o: ["High cost", "Low power consumption", "High noise", "Large chip area"], a: 1 },
+            { cat: "CMOS Technology", q: "CMOS circuits consume minimum power in", o: ["Dynamic state", "Switching state", "Static state", "Active state"], a: 2 },
+            { cat: "VLSI Design Flow", q: "The first step in VLSI design flow is", o: ["Fabrication", "Layout design", "System specification", "Testing"], a: 2 },
+            { cat: "VLSI Design Flow", q: "Which stage checks correctness of logic design?", o: ["Packaging", "Verification", "Fabrication", "Layout"], a: 1 },
+            { cat: "VLSI Design Flow", q: "Physical implementation of the circuit is done during", o: ["Schematic design", "Simulation", "Layout design", "Testing"], a: 2 },
+            { cat: "Applications & Career", q: "VLSI is widely used in", o: ["Washing machines", "Microprocessors", "Mechanical tools", "Power transformers"], a: 1 },
+            { cat: "Applications & Career", q: "Which field offers career opportunities related to VLSI?", o: ["IC design", "Chip fabrication", "Semiconductor testing", "All of the above"], a: 3 },
+            { cat: "Verilog & Modeling", q: "Which modeling style uses logic gates directly?", o: ["Behavioral", "Structural", "Gate-level", "Dataflow"], a: 2 },
+            { cat: "Verilog & Modeling", q: "Behavioral modeling mainly uses", o: ["Gate primitives", "always blocks", "Module instantiation", "Transistors"], a: 1 },
+            { cat: "Verilog & Modeling", q: "Structural modeling represents", o: ["Algorithmic behavior", "Truth table", "Interconnection of modules", "Timing waveform"], a: 2 },
+            { cat: "Verilog & Modeling", q: "Verilog is mainly used for", o: ["PCB design", "Hardware description", "Mechanical simulation", "Power analysis"], a: 1 },
+            { cat: "Adders", q: "A half adder has", o: ["1 input and 1 output", "2 inputs and 2 outputs", "3 inputs and 2 outputs", "2 inputs and 1 output"], a: 1 },
+            { cat: "Adders", q: "Outputs of a half adder are", o: ["Sum and Borrow", "Carry and Borrow", "Sum and Carry", "Difference and Carry"], a: 2 },
+            { cat: "Adders", q: "A full adder has", o: ["Two inputs", "Three inputs", "One output", "Four inputs"], a: 1 },
+            { cat: "Adders", q: "A full adder can be built using", o: ["One half adder", "Two half adders and one OR gate", "Two XOR gates only", "One AND gate"], a: 1 },
+            { cat: "Combinational Circuits", q: "Combinational circuits depend on", o: ["Past inputs", "Clock signal", "Present inputs only", "Memory elements"], a: 2 },
+            { cat: "Combinational Circuits", q: "Which of the following is NOT a combinational circuit?", o: ["Multiplexer", "Decoder", "Flip-flop", "Encoder"], a: 2 },
+            { cat: "Combinational Circuits", q: "Combinational circuits are mainly used for", o: ["Storage", "Data selection and routing", "Synchronization", "Timing control"], a: 1 },
+            { cat: "Multiplexer (MUX)", q: "A multiplexer is used to", o: ["Distribute data", "Select data", "Store data", "Amplify data"], a: 1 },
+            { cat: "Multiplexer (MUX)", q: "A 4:1 multiplexer requires how many select lines?", o: ["1", "2", "3", "4"], a: 1 },
+            { cat: "Demultiplexer (DEMUX)", q: "A demultiplexer performs", o: ["Many-to-one operation", "One-to-many operation", "Encoding", "Decoding"], a: 1 },
+            { cat: "Demultiplexer (DEMUX)", q: "DEMUX is mainly used for", o: ["Data storage", "Data distribution", "Arithmetic operation", "Code conversion"], a: 1 },
+            { cat: "Decoder & Encoder", q: "A decoder converts", o: ["Many inputs into one output", "Binary input into one active output", "One input into binary output", "Analog to digital"], a: 1 },
+            { cat: "Decoder & Encoder", q: "The reverse operation of a decoder is", o: ["Multiplexer", "Demultiplexer", "Encoder", "Adder"], a: 2 },
+            { cat: "Decoder & Encoder", q: "A priority encoder is used when", o: ["Only one input is active", "Multiple inputs are active", "No inputs are active", "Inputs are sequential"], a: 1 },
+        ];
+        const TOTAL = QS.length, SECS = 20 * 60, LBL = ['A', 'B', 'C', 'D'];
+
+        /* ── State ── */
+        let st = {
+            name: '', id: '', q: 0, score: 0, answered: false, warns: 0, dq: false,
+            start: null, end: null, secLeft: SECS, timer: null, viols: [],
+            answers: new Array(TOTAL).fill(-1)
+        }; // -1 = skipped
+
+        /* ── DOM helpers ── */
+        const $ = id => document.getElementById(id);
+        function show(k) {
+            ['landing', 'quiz', 'result'].forEach(s => {
+                const id = s === 'landing' ? 'screen-landing' : s === 'quiz' ? 'screen-quiz' : 'screen-result';
+                $(id).classList.remove('active'); $(id).classList.add('hidden');
+            });
+            const el = $(`screen-${k}`); el.classList.remove('hidden'); el.classList.add('active');
+            if (k === 'result') el.scrollTop = 0;
+        }
+        function showOv(k) { $(k).classList.remove('hidden'); $(k).classList.add('active') }
+        function hideOv(k) { $(k).classList.remove('active'); $(k).classList.add('hidden') }
+
+        /* ── Start ── */
+        $('btn-start').addEventListener('click', () => {
+            const n = $('inp-name').value.trim(), id = $('inp-id').value.trim();
+            if (!n) { alert('Please enter your full name.'); return }
+            if (!id) { alert('Please enter your Register Number / ID.'); return }
+            st.name = n; st.id = id;
+            const el = document.documentElement;
+            (el.requestFullscreen || el.webkitRequestFullscreen || el.mozRequestFullScreen || function () { }).call(el).catch(() => { });
+            st.start = new Date(); st.secLeft = SECS;
+            st.answers = new Array(TOTAL).fill(-1);
+            $('hdr-user').innerHTML = '👤 ' + n;
+            show('quiz'); loadQ(0); startTimer();
+        });
+
+        /* ── Timer ── */
+        function startTimer() {
+            updateTimer();
+            st.timer = setInterval(() => { st.secLeft--; updateTimer(); if (st.secLeft <= 0) { clearInterval(st.timer); finish('time_up') } }, 1000);
+        }
+        function updateTimer() {
+            const m = String(Math.floor(st.secLeft / 60)).padStart(2, '0'), s = String(st.secLeft % 60).padStart(2, '0');
+            $('tval').textContent = `${m}:${s}`;
+            if (st.secLeft <= 60) { $('hdr-timer').classList.add('low'); $('tdot').classList.add('low') }
+        }
+
+        /* ── Load question ── */
+        function loadQ(i) {
+            st.q = i; st.answered = false;
+            const q = QS[i];
+            $('q-cat').textContent = q.cat;
+            $('q-text').textContent = `Q${i + 1}. ${q.q}`;
+            $('q-num').textContent = String(i + 1).padStart(2, '0') + ' / ' + TOTAL;
+            $('hdr-qcount').textContent = `Q ${i + 1} / ${TOTAL}`;
+            $('progress-fill').style.width = (i / TOTAL * 100) + '%';
+            const grid = $('opts-grid'); grid.innerHTML = '';
+            q.o.forEach((opt, j) => {
+                const btn = document.createElement('button');
+                btn.className = 'opt';
+                btn.innerHTML = `<span class="opt-lbl">${LBL[j]}</span>${opt}`;
+                btn.addEventListener('click', () => pick(btn, j, i));
+                grid.appendChild(btn);
+            });
+            $('btn-next').disabled = true;
+            const card = $('qcard'); card.style.animation = 'none'; requestAnimationFrame(() => { card.style.animation = '' });
+        }
+
+        /* ── Pick option ── */
+        function pick(btn, i, qi) {
+            if (st.answered) return; st.answered = true;
+            st.answers[qi] = i; // record user's choice
+            const q = QS[qi], btns = document.querySelectorAll('.opt');
+            if (i === q.a) { st.score++; btn.classList.add('correct') }
+            else { btn.classList.add('wrong'); btns[q.a].classList.add('correct') }
+            btns.forEach(b => b.disabled = true);
+            $('btn-next').disabled = false;
+        }
+
+        /* ── Next ── */
+        $('btn-next').addEventListener('click', () => {
+            const next = st.q + 1;
+            if (next < TOTAL) loadQ(next); else finish('completed');
+        });
+
+        /* ── Finish ── */
+        function finish(reason) {
+            clearInterval(st.timer); st.end = new Date(); st.dq = (reason === 'disqualified');
+            const secs = Math.round((st.end - st.start) / 1000), mm = Math.floor(secs / 60), ss = secs % 60;
+            (document.exitFullscreen || document.webkitExitFullscreen || function () { }).call(document).catch(() => { });
+            const data = { name: st.name, regId: st.id, score: st.score, total: TOTAL, timeTaken: `${mm}m ${ss}s`, violations: st.viols, reason, submittedAt: new Date().toISOString() };
+            pushFB(data);
+            // Populate result header
+            const pct = st.score / TOTAL * 100;
+            $('r-trophy').textContent = reason === 'disqualified' ? '🚫' : reason === 'time_up' ? '⏰' : '🏆';
+            $('r-title').textContent = reason === 'disqualified' ? 'Disqualified' : reason === 'time_up' ? "Time's Up!" : "Test Completed!";
+            $('r-name').textContent = st.name + ' · ' + st.id;
+            $('r-score').textContent = st.score;
+            $('s-correct').textContent = st.score;
+            $('s-wrong').textContent = TOTAL - st.score;
+            $('s-acc').textContent = pct.toFixed(1) + '%';
+            $('s-time').textContent = `${mm}m ${ss}s`;
+            $('progress-fill').style.width = '100%';
+            // Ring animation
+            const arc = $('ring-arc');
+            const offset = 378 * (1 - st.score / TOTAL);
+            if (pct < 40) arc.setAttribute('stroke', 'url(#ring-grad-warn)');
+            setTimeout(() => arc.style.strokeDashoffset = offset, 120);
+            // Build review
+            buildReview();
+            show('result');
+        }
+
+        /* ── Build Answer Review ── */
+        function buildReview() {
+            const list = $('review-list'); list.innerHTML = '';
+            const attempted = st.answers.filter(a => a !== -1).length;
+            $('rev-badge').textContent = `${attempted} Answered · ${TOTAL - attempted} Skipped`;
+
+            QS.forEach((q, i) => {
+                const userAns = st.answers[i];
+                const correct = q.a;
+                const isCorrect = userAns === correct;
+                const isSkipped = userAns === -1;
+
+                // Card
+                const card = document.createElement('div');
+                card.className = 'glass rq-card';
+                card.style.animationDelay = (i * 0.04) + 's';
+
+                // Status label
+                let statusClass = 'skipped', statusText = '⬜ Skipped';
+                if (!isSkipped) { statusClass = isCorrect ? 'correct' : 'wrong'; statusText = isCorrect ? '✅ Correct' : '❌ Wrong' }
+
+                // Options HTML
+                const optsHtml = q.o.map((opt, j) => {
+                    let cls = 'rq-opt neutral', lblCls = 'rq-lbl';
+                    const isThisCorrect = (j === correct);
+                    const isUserPick = (j === userAns);
+                    if (isThisCorrect && isUserPick) { cls = 'rq-opt is-correct is-user-selected' }
+                    else if (isThisCorrect) { cls = 'rq-opt is-correct' }
+                    else if (isUserPick && !isThisCorrect) { cls = 'rq-opt is-wrong is-user-selected' }
+                    return `<div class="${cls}"><span class="${lblCls}">${LBL[j]}</span>${opt}</div>`;
+                }).join('');
+
+                // Footer
+                let footerHtml = `<div class="rq-footer">✅ Correct Answer: <strong>${LBL[correct]}. ${q.o[correct]}</strong></div>`;
+                if (!isSkipped && !isCorrect) {
+                    footerHtml += `<div class="rq-footer" style="margin-top:4px">Your Answer: <strong style="color:var(--danger)">${LBL[userAns]}. ${q.o[userAns]}</strong></div>`;
+                }
+                if (isSkipped) { footerHtml = `<div class="rq-footer">⬜ Not answered — Correct: <strong>${LBL[correct]}. ${q.o[correct]}</strong></div>` }
+
+                card.innerHTML = `
+      <div class="rq-top">
+        <span class="rq-cat">${q.cat}</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="rq-num">Q${String(i + 1).padStart(2, '0')}</span>
+          <span class="rq-status ${statusClass}">${statusText}</span>
+        </div>
+      </div>
+      <div class="rq-question">${q.q}</div>
+      <div class="rq-opts">${optsHtml}</div>
+      ${footerHtml}
+    `;
+                list.appendChild(card);
+            });
+        }
+
+        /* ── Anti-cheat ── */
+        function violate(type) {
+            if (st.dq || !$('screen-quiz').classList.contains('active')) return;
+            st.viols.push({ type, time: new Date().toISOString() });
+            pushFB({ name: st.name, regId: st.id, event: 'VIOLATION', type, warnNum: st.warns + 1, time: new Date().toISOString() });
+            st.warns++;
+            if (st.warns >= 2) { st.dq = true; clearInterval(st.timer); hideOv('screen-warning'); showOv('screen-dq'); setTimeout(() => finish('disqualified'), 2800); return }
+            $('warn-msg').textContent = `Violation: "${type}" has been logged. One more violation = immediate disqualification.`;
+            showOv('screen-warning');
+        }
+        $('btn-resume').addEventListener('click', () => { hideOv('screen-warning'); (document.documentElement.requestFullscreen || document.documentElement.webkitRequestFullscreen || function () { }).call(document.documentElement).catch(() => { }) });
+        document.addEventListener('visibilitychange', () => { if (document.hidden) violate('Tab switch') });
+        ['fullscreenchange', 'webkitfullscreenchange', 'mozfullscreenchange'].forEach(e => document.addEventListener(e, () => { if (!document.fullscreenElement && !document.webkitFullscreenElement) violate('Fullscreen exited') }));
+        ['contextmenu', 'copy', 'cut', 'paste', 'selectstart'].forEach(e => document.addEventListener(e, ev => ev.preventDefault()));
+        document.addEventListener('keydown', e => {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && 'IJC'.includes(e.key)) || (e.ctrlKey && 'UuAaCcVvXxSsPp'.includes(e.key))) {
+                e.preventDefault(); violate('DevTools/shortcut attempt');
+            }
+        });
+    </script>
+</body>
+
+</html>

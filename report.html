@@ -1,0 +1,867 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+    <title>RACE PHASE 2 — Test Report</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500&display=swap"
+        rel="stylesheet" />
+    <style>
+        :root {
+            --bg: #04060f;
+            --surface: #0b0f1e;
+            --card: rgba(255, 255, 255, .045);
+            --border: rgba(255, 255, 255, .09);
+            --accent: #7c6ef7;
+            --accent2: #f73c8e;
+            --accent3: #00e5a0;
+            --gold: #ffc857;
+            --danger: #ff4747;
+            --text: #eef0f8;
+            --muted: #6b7899
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 32px 20px
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 60% at 15% 5%, rgba(124, 110, 247, .18) 0%, transparent 65%), radial-gradient(ellipse 60% 50% at 85% 90%, rgba(247, 60, 142, .12) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0
+        }
+
+        .wrap {
+            max-width: 1000px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 32px
+        }
+
+        /* header */
+        .report-header {
+            text-align: center;
+            padding: 40px 32px;
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .09);
+            border-radius: 20px;
+            backdrop-filter: blur(20px)
+        }
+
+        .rh-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 5px 16px 5px 6px;
+            border-radius: 999px;
+            background: linear-gradient(135deg, rgba(124, 110, 247, .25), rgba(247, 60, 142, .15));
+            border: 1px solid rgba(124, 110, 247, .35);
+            margin-bottom: 16px
+        }
+
+        .rh-dot {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7c6ef7, #f73c8e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 900;
+            color: #fff
+        }
+
+        .rh-chip span {
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: rgba(255, 255, 255, .7)
+        }
+
+        .report-header h1 {
+            font-size: clamp(22px, 4vw, 34px);
+            font-weight: 900;
+            color: #fff;
+            margin-bottom: 6px
+        }
+
+        .report-header h1 span {
+            background: linear-gradient(135deg, #7c6ef7, #f73c8e, #ffc857);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text
+        }
+
+        .report-header p {
+            font-size: 13px;
+            color: var(--muted)
+        }
+
+        /* kpi row */
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 16px
+        }
+
+        .kpi {
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .09);
+            border-radius: 16px;
+            padding: 22px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            backdrop-filter: blur(16px)
+        }
+
+        .kpi-val {
+            font-size: 32px;
+            font-weight: 900
+        }
+
+        .kpi-lbl {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--muted)
+        }
+
+        .kpi-accent {
+            color: var(--accent)
+        }
+
+        .kpi-green {
+            color: var(--accent3)
+        }
+
+        .kpi-gold {
+            color: var(--gold)
+        }
+
+        .kpi-red {
+            color: var(--danger)
+        }
+
+        .kpi-pink {
+            color: var(--accent2)
+        }
+
+        /* section */
+        .section-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px
+        }
+
+        .section-title span {
+            padding: 3px 10px;
+            border-radius: 999px;
+            background: rgba(124, 110, 247, .12);
+            border: 1px solid rgba(124, 110, 247, .2);
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--accent)
+        }
+
+        /* table */
+        .table-wrap {
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .09);
+            border-radius: 16px;
+            overflow: hidden;
+            backdrop-filter: blur(16px)
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse
+        }
+
+        thead tr {
+            background: rgba(124, 110, 247, .1);
+            border-bottom: 1px solid rgba(124, 110, 247, .2)
+        }
+
+        thead th {
+            padding: 12px 16px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--accent);
+            text-align: left
+        }
+
+        tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, .05);
+            transition: background .15s
+        }
+
+        tbody tr:last-child {
+            border-bottom: none
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, .03)
+        }
+
+        td {
+            padding: 13px 16px;
+            font-size: 13px;
+            color: var(--text)
+        }
+
+        .rank {
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 13px
+        }
+
+        .rank-1 {
+            color: var(--gold)
+        }
+
+        .rank-2 {
+            color: #c0c0c0
+        }
+
+        .rank-3 {
+            color: #cd7f32
+        }
+
+        .score-bar-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px
+        }
+
+        .score-bar {
+            height: 6px;
+            border-radius: 99px;
+            background: rgba(255, 255, 255, .06);
+            flex: 1;
+            min-width: 60px
+        }
+
+        .score-fill {
+            height: 100%;
+            border-radius: 99px;
+            background: linear-gradient(90deg, var(--accent), var(--accent3))
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 9px;
+            border-radius: 999px;
+            font-size: 11px;
+            font-weight: 700
+        }
+
+        .badge-done {
+            background: rgba(0, 229, 160, .1);
+            color: var(--accent3);
+            border: 1px solid rgba(0, 229, 160, .2)
+        }
+
+        .badge-dq {
+            background: rgba(255, 71, 71, .1);
+            color: var(--danger);
+            border: 1px solid rgba(255, 71, 71, .2)
+        }
+
+        .badge-warn {
+            background: rgba(255, 200, 87, .1);
+            color: var(--gold);
+            border: 1px solid rgba(255, 200, 87, .2)
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--muted)
+        }
+
+        /* violation card */
+        .viol-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px
+        }
+
+        .viol-card {
+            background: rgba(255, 71, 71, .05);
+            border: 1px solid rgba(255, 71, 71, .12);
+            border-radius: 12px;
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px
+        }
+
+        .viol-name {
+            font-weight: 700;
+            font-size: 14px
+        }
+
+        .viol-type {
+            font-size: 12px;
+            color: var(--danger)
+        }
+
+        .viol-id {
+            font-size: 11px;
+            color: var(--muted);
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        .viol-time {
+            font-size: 11px;
+            color: var(--muted);
+            font-family: 'JetBrains Mono', monospace
+        }
+
+        /* footer */
+        .report-footer {
+            text-align: center;
+            font-size: 12px;
+            color: var(--muted);
+            padding: 20px
+        }
+
+        @media(max-width:600px) {
+
+            thead th:nth-child(4),
+            td:nth-child(4) {
+                display: none
+            }
+        }
+
+        @media print {
+            body {
+                background: #fff;
+                color: #000
+            }
+
+            .wrap {
+                max-width: 100%
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+
+        <!-- Header -->
+        <div class="report-header">
+            <div class="rh-chip">
+                <div class="rh-dot">R</div><span>R·A·C·E PROGRAM</span>
+            </div>
+            <h1>RACE PHASE 2 <span>SESSION MCQ TEST</span></h1>
+            <p>Test Report · Generated 02 March 2026 · VLSI &amp; IC Basics · 30 Questions · 20 Minutes</p>
+        </div>
+
+        <!-- KPIs -->
+        <div class="kpi-row">
+            <div class="kpi"><span class="kpi-val kpi-accent">30</span><span class="kpi-lbl">Total Participants</span>
+            </div>
+            <div class="kpi"><span class="kpi-val kpi-green">27</span><span class="kpi-lbl">Completed</span></div>
+            <div class="kpi"><span class="kpi-val kpi-red">2</span><span class="kpi-lbl">Disqualified</span></div>
+            <div class="kpi"><span class="kpi-val kpi-gold">30/30</span><span class="kpi-lbl">Top Score</span></div>
+            <div class="kpi"><span class="kpi-val kpi-pink">23.65</span><span class="kpi-lbl">Avg Score</span></div>
+        </div>
+
+        <!-- Leaderboard -->
+        <div>
+            <div class="section-title">🏆 Leaderboard <span>Completed · Ranked by Score</span></div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Reg ID</th>
+                            <th>Score</th>
+                            <th>Time Taken</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Rank 1 — Tie -->
+                        <tr>
+                            <td class="rank rank-1">🥇 1</td>
+                            <td><strong>Sarabheswaran E S</strong></td>
+                            <td class="mono">2024ec0272</td>
+                            <td>
+                                <div class="score-bar-wrap">
+                                    <strong>30</strong>/30
+                                    <div class="score-bar">
+                                        <div class="score-fill" style="width:100%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">6m 48s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td class="rank rank-1">🥇 1</td>
+                            <td><strong>Sarathi Selvam D</strong></td>
+                            <td class="mono">2127240701146</td>
+                            <td>
+                                <div class="score-bar-wrap">
+                                    <strong>30</strong>/30
+                                    <div class="score-bar">
+                                        <div class="score-fill" style="width:100%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">7m 24s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                        <!-- Rank 3 -->
+                        <tr>
+                            <td class="rank rank-2">🥈 3</td>
+                            <td><strong>Guru P</strong></td>
+                            <td class="mono">2024ec0279</td>
+                            <td>
+                                <div class="score-bar-wrap">
+                                    <strong>29</strong>/30
+                                    <div class="score-bar">
+                                        <div class="score-fill" style="width:96.7%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">6m 47s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td class="rank rank-2">🥈 3</td>
+                            <td><strong>Tamilpriyan M</strong></td>
+                            <td class="mono">2024ec0061</td>
+                            <td>
+                                <div class="score-bar-wrap">
+                                    <strong>29</strong>/30
+                                    <div class="score-bar">
+                                        <div class="score-fill" style="width:96.7%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">7m 16s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                        <!-- Rank 5 -->
+                        <tr>
+                            <td class="rank rank-3">🥉 5</td>
+                            <td><strong>Harini Sri M</strong></td>
+                            <td class="mono">2127240701054</td>
+                            <td>
+                                <div class="score-bar-wrap">
+                                    <strong>28</strong>/30
+                                    <div class="score-bar">
+                                        <div class="score-fill" style="width:93.3%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">3m 59s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td class="rank rank-3">🥉 5</td>
+                            <td><strong>Princy Nikitha J</strong></td>
+                            <td class="mono">2127240701118</td>
+                            <td>
+                                <div class="score-bar-wrap">
+                                    <strong>28</strong>/30
+                                    <div class="score-bar">
+                                        <div class="score-fill" style="width:93.3%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">7m 50s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                        <!-- Rank 7 -->
+                        <tr>
+                            <td class="rank">7</td>
+                            <td>Saisha priyadarshini s</td>
+                            <td class="mono">2127240701138</td>
+                            <td>
+                                <div class="score-bar-wrap"><strong>27</strong>/30<div class="score-bar">
+                                        <div class="score-fill" style="width:90%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">7m 35s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td class="rank">7</td>
+                            <td>Shamitha Saravanan</td>
+                            <td class="mono">2127240701150</td>
+                            <td>
+                                <div class="score-bar-wrap"><strong>27</strong>/30<div class="score-bar">
+                                        <div class="score-fill" style="width:90%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">8m 13s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td class="rank">9</td>
+                            <td>Girisha Gayathri B ⚠</td>
+                            <td class="mono">2127240701041</td>
+                            <td>
+                                <div class="score-bar-wrap"><strong>26</strong>/30<div class="score-bar">
+                                        <div class="score-fill" style="width:86.7%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">3m 54s</td>
+                            <td><span class="badge badge-warn">⚠ Re-attempted</span></td>
+                        </tr>
+                        <tr>
+                            <td class="rank">9</td>
+                            <td>SANYU J</td>
+                            <td class="mono">2024ec0645</td>
+                            <td>
+                                <div class="score-bar-wrap"><strong>26</strong>/30<div class="score-bar">
+                                        <div class="score-fill" style="width:86.7%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">8m 29s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td class="rank">9</td>
+                            <td>Preethika R</td>
+                            <td class="mono">2127240701116</td>
+                            <td>
+                                <div class="score-bar-wrap"><strong>26</strong>/30<div class="score-bar">
+                                        <div class="score-fill" style="width:86.7%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">7m 57s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td class="rank">12</td>
+                            <td>N Yaazhinii</td>
+                            <td class="mono">2127240701102</td>
+                            <td>
+                                <div class="score-bar-wrap"><strong>25</strong>/30<div class="score-bar">
+                                        <div class="score-fill" style="width:83.3%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">6m 16s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td class="rank">12</td>
+                            <td>John Joshua Solomon Rajesh</td>
+                            <td class="mono">2127240701065</td>
+                            <td>
+                                <div class="score-bar-wrap"><strong>25</strong>/30<div class="score-bar">
+                                        <div class="score-fill" style="width:83.3%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">6m 29s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td class="rank">14</td>
+                            <td>Enthezhil T</td>
+                            <td class="mono">2127240701039</td>
+                            <td>
+                                <div class="score-bar-wrap"><strong>23</strong>/30<div class="score-bar">
+                                        <div class="score-fill" style="width:76.7%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">3m 52s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td class="rank">14</td>
+                            <td>Kaviya Sri S</td>
+                            <td class="mono">2127240701078</td>
+                            <td>
+                                <div class="score-bar-wrap"><strong>23</strong>/30<div class="score-bar">
+                                        <div class="score-fill" style="width:76.7%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">6m 6s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td class="rank">14</td>
+                            <td>Nandhithasri K K</td>
+                            <td class="mono">2127240701104</td>
+                            <td>
+                                <div class="score-bar-wrap"><strong>23</strong>/30<div class="score-bar">
+                                        <div class="score-fill" style="width:76.7%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">6m 2s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td class="rank">14</td>
+                            <td>B S Aarti</td>
+                            <td class="mono">2127240701019</td>
+                            <td>
+                                <div class="score-bar-wrap"><strong>23</strong>/30<div class="score-bar">
+                                        <div class="score-fill" style="width:76.7%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">9m 3s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td class="rank">18</td>
+                            <td>Sivaraman A</td>
+                            <td class="mono">2127240701157</td>
+                            <td>
+                                <div class="score-bar-wrap"><strong>22</strong>/30<div class="score-bar">
+                                        <div class="score-fill" style="width:73.3%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">4m 29s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td class="rank">19</td>
+                            <td>KALAISELVAN K ⚠</td>
+                            <td class="mono">2024EC0205</td>
+                            <td>
+                                <div class="score-bar-wrap"><strong>21</strong>/30<div class="score-bar">
+                                        <div class="score-fill" style="width:70%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">7m 45s</td>
+                            <td><span class="badge badge-warn">⚠ 1 Violation</span></td>
+                        </tr>
+                        <tr>
+                            <td class="rank">19</td>
+                            <td>Nandhagopal B</td>
+                            <td class="mono">2127240701103</td>
+                            <td>
+                                <div class="score-bar-wrap"><strong>21</strong>/30<div class="score-bar">
+                                        <div class="score-fill" style="width:70%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">3m 27s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td class="rank">21</td>
+                            <td>RamSubeesha RS</td>
+                            <td class="mono">2127240701126</td>
+                            <td>
+                                <div class="score-bar-wrap"><strong>20</strong>/30<div class="score-bar">
+                                        <div class="score-fill" style="width:66.7%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">4m 18s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td class="rank">21</td>
+                            <td>Sreekha PV</td>
+                            <td class="mono">212724070159</td>
+                            <td>
+                                <div class="score-bar-wrap"><strong>20</strong>/30<div class="score-bar">
+                                        <div class="score-fill" style="width:66.7%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">6m 41s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td class="rank">23</td>
+                            <td>praveen babu g</td>
+                            <td class="mono">2127240701114</td>
+                            <td>
+                                <div class="score-bar-wrap"><strong>19</strong>/30<div class="score-bar">
+                                        <div class="score-fill" style="width:63.3%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">6m 48s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                        <tr>
+                            <td class="rank">24</td>
+                            <td>Pavithra M</td>
+                            <td class="mono">2127240701112</td>
+                            <td>
+                                <div class="score-bar-wrap"><strong>18</strong>/30<div class="score-bar">
+                                        <div class="score-fill" style="width:60%"></div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="mono">7m 41s</td>
+                            <td><span class="badge badge-done">✅ Completed</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Disqualified -->
+        <div>
+            <div class="section-title">❌ Disqualified Candidates <span>2 Students</span></div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Reg ID</th>
+                            <th>Score at DQ</th>
+                            <th>Time</th>
+                            <th>Violations</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Girisha Gayathri B</strong></td>
+                            <td class="mono">2127240701041</td>
+                            <td><strong style="color:var(--danger)">7</strong>/30</td>
+                            <td class="mono">2m 32s</td>
+                            <td><span class="badge badge-dq">Tab Switch + Fullscreen Exit</span></td>
+                        </tr>
+                        <tr>
+                            <td><strong>M Meenakshi</strong></td>
+                            <td class="mono">2127240701098</td>
+                            <td><strong style="color:var(--danger)">2</strong>/30</td>
+                            <td class="mono">4m 0s</td>
+                            <td><span class="badge badge-dq">Tab Switch + Fullscreen Exit</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Violation Log -->
+        <div>
+            <div class="section-title">⚠️ Violation Log <span>All Incidents</span></div>
+            <div class="viol-list">
+                <div class="viol-card">
+                    <div>
+                        <div class="viol-name">KALAISELVAN K</div>
+                        <div class="viol-id">2024EC0205</div>
+                    </div>
+                    <div class="viol-type">Tab Switch · Warning #1</div>
+                    <div class="viol-time">21:05:13 IST · Completed test (21/30)</div>
+                </div>
+                <div class="viol-card">
+                    <div>
+                        <div class="viol-name">Girisha Gayathri B</div>
+                        <div class="viol-id">2127240701041</div>
+                    </div>
+                    <div class="viol-type">Tab Switch · Warning #1 → Fullscreen Exit · Warning #2 → DISQUALIFIED</div>
+                    <div class="viol-time">21:06:03 & 21:06:08 IST · Score at DQ: 7/30</div>
+                </div>
+                <div class="viol-card">
+                    <div>
+                        <div class="viol-name">M Meenakshi</div>
+                        <div class="viol-id">2127240701098</div>
+                    </div>
+                    <div class="viol-type">Tab Switch · Warning #1 → Fullscreen Exit · Warning #2 → DISQUALIFIED</div>
+                    <div class="viol-time">21:08:44 & 21:08:46 IST · Score at DQ: 2/30</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Score Distribution -->
+        <div>
+            <div class="section-title">📊 Score Distribution <span>Completed Students Only</span></div>
+            <div class="table-wrap" style="padding:24px 20px">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Range</th>
+                            <th>Count</th>
+                            <th>Students</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>🟢 28–30 (Excellent)</td>
+                            <td><strong style="color:var(--accent3)">6</strong></td>
+                            <td>Sarabheswaran, Sarathi Selvam, Guru P, Tamilpriyan, Harini Sri, Princy Nikitha</td>
+                        </tr>
+                        <tr>
+                            <td>🟡 23–27 (Good)</td>
+                            <td><strong style="color:var(--gold)">11</strong></td>
+                            <td>Saisha, Shamitha, Girisha*, SANYU, Preethika, N Yaazhinii, John Joshua, Enthezhil,
+                                Kaviya Sri, Nandhithasri, B S Aarti</td>
+                        </tr>
+                        <tr>
+                            <td>🟠 18–22 (Average)</td>
+                            <td><strong style="color:var(--accent2)">8</strong></td>
+                            <td>Sivaraman, Kalaiselvan, Nandhagopal, RamSubeesha, Sreekha, praveen babu, Pavithra,
+                                LOHITH*</td>
+                        </tr>
+                        <tr>
+                            <td>🔴 Below 18 (Needs Improvement)</td>
+                            <td><strong style="color:var(--danger)">0</strong></td>
+                            <td>—</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="font-size:11px;color:var(--muted);margin-top:12px">* Girisha Gayathri re-appeared after
+                    disqualification: scored 26 · * LOHITH (test user) scored 2</p>
+            </div>
+        </div>
+
+        <div class="report-footer">
+            RACE PHASE 2 SESSION MCQ TEST · Report generated 02 March 2026, 21:14 IST<br />
+            Data source: Firebase Realtime Database · quiz_race_results
+        </div>
+
+    </div>
+</body>
+
+</html>
