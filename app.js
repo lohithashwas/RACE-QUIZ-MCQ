@@ -47,19 +47,19 @@ const QUESTIONS = [
   { cat:"Flip-Flops", q:"In JK Flip-Flop, when J=K=1:", opts:["Reset", "Set", "Toggle", "Hold"], ans:2 },
 
   // Section 9: Find the Bug in Verilog Code
-  { cat:"Find the Bug in Verilog Code", q:"Identify the bug\n\nassign y = a && b;", opts:["Syntax error", "Wrong operator", "Missing input", "No error"], ans:1 },
-  { cat:"Find the Bug in Verilog Code", q:"Identify the bug\n\nalways @(*)\nbegin\ny = a;\nend\n\nOutput declared as:\noutput y;", opts:["No issue", "y must be reg", "always block wrong", "assign required"], ans:1 },
-  { cat:"Find the Bug in Verilog Code", q:"Identify the bug\n\nalways @(posedge clk)\nq = d;", opts:["Should use <=", "Should use assign", "clk wrong", "No error"], ans:0 },
+  { cat:"Find the Bug", q:"Identify the bug\n\nassign y = a && b;", opts:["Syntax error", "Wrong operator", "Missing input", "No error"], ans:1 },
+  { cat:"Find the Bug", q:"Identify the bug\n\nalways @(*)\nbegin\ny = a;\nend\n\nOutput declared as:\noutput y;", opts:["No issue", "y must be reg", "always block wrong", "assign required"], ans:1 },
+  { cat:"Find the Bug", q:"Identify the bug\n\nalways @(posedge clk)\nq = d;", opts:["Should use <=", "Should use assign", "clk wrong", "No error"], ans:0 },
 
   // Section 10: Testbench Questions
-  { cat:"Testbench Questions", q:"What is the purpose of a testbench?", opts:["Synthesis", "Fabrication", "Verification", "Routing"], ans:2 },
-  { cat:"Testbench Questions", q:"Which block is mainly used in testbench to apply inputs?", opts:["always", "initial", "assign", "module"], ans:1 },
-  { cat:"Testbench Questions", q:"$finish command does:", opts:["Start simulation", "Stop simulation", "Display waveform", "Reset module"], ans:1 },
+  { cat:"Testbench", q:"What is the purpose of a testbench?", opts:["Synthesis", "Fabrication", "Verification", "Routing"], ans:2 },
+  { cat:"Testbench", q:"Which block is mainly used in testbench to apply inputs?", opts:["always", "initial", "assign", "module"], ans:1 },
+  { cat:"Testbench", q:"$finish command does:", opts:["Start simulation", "Stop simulation", "Display waveform", "Reset module"], ans:1 },
 
   // Section 11: Blocking vs Non-Blocking Assignment
-  { cat:"Blocking vs Non-Blocking Assignment", q:"In Verilog, = represents:", opts:["Non-blocking assignment", "Blocking assignment", "Comparison", "Continuous assignment"], ans:1 },
-  { cat:"Blocking vs Non-Blocking Assignment", q:"In Verilog, <= represents:", opts:["Blocking assignment", "Non-blocking assignment", "Comparison", "Logical operator"], ans:1 },
-  { cat:"Blocking vs Non-Blocking Assignment", q:"Non-blocking assignment is mainly used for:", opts:["Combinational circuits", "Sequential circuits", "Testbench only", "Encoders"], ans:1 }
+  { cat:"Blocking vs Non-Blocking", q:"In Verilog, = represents:", opts:["Non-blocking assignment", "Blocking assignment", "Comparison", "Continuous assignment"], ans:1 },
+  { cat:"Blocking vs Non-Blocking", q:"In Verilog, <= represents:", opts:["Blocking assignment", "Non-blocking assignment", "Comparison", "Logical operator"], ans:1 },
+  { cat:"Blocking vs Non-Blocking", q:"Non-blocking assignment is mainly used for:", opts:["Combinational circuits", "Sequential circuits", "Testbench only", "Encoders"], ans:1 }
 ];
 
 const TOTAL_Q      = QUESTIONS.length; // 30
