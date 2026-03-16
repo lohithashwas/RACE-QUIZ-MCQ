@@ -1412,36 +1412,57 @@
 
         /* ── Questions ── */
         const QS = [
-            { cat: "VLSI & IC Basics", q: "VLSI stands for", o: ["Very Large System Integration", "Very Large Scale Integration", "Very Low Scale Integration", "Variable Large Scale Integration"], a: 1 },
-            { cat: "VLSI & IC Basics", q: "An Integrated Circuit (IC) is", o: ["A single logic gate", "A discrete component", "A complete circuit fabricated on a single chip", "A PCB"], a: 2 },
-            { cat: "VLSI & IC Basics", q: "Which of the following is an advantage of ICs?", o: ["Large size", "High power consumption", "High reliability", "Complex wiring"], a: 2 },
-            { cat: "VLSI & IC Basics", q: "The packing density of components is highest in", o: ["SSI", "MSI", "LSI", "VLSI"], a: 3 },
-            { cat: "CMOS Technology", q: "CMOS technology uses", o: ["Only NMOS", "Only PMOS", "Both NMOS and PMOS", "Bipolar transistors"], a: 2 },
-            { cat: "CMOS Technology", q: "The main advantage of CMOS technology is", o: ["High cost", "Low power consumption", "High noise", "Large chip area"], a: 1 },
-            { cat: "CMOS Technology", q: "CMOS circuits consume minimum power in", o: ["Dynamic state", "Switching state", "Static state", "Active state"], a: 2 },
-            { cat: "VLSI Design Flow", q: "The first step in VLSI design flow is", o: ["Fabrication", "Layout design", "System specification", "Testing"], a: 2 },
-            { cat: "VLSI Design Flow", q: "Which stage checks correctness of logic design?", o: ["Packaging", "Verification", "Fabrication", "Layout"], a: 1 },
-            { cat: "VLSI Design Flow", q: "Physical implementation of the circuit is done during", o: ["Schematic design", "Simulation", "Layout design", "Testing"], a: 2 },
-            { cat: "Applications & Career", q: "VLSI is widely used in", o: ["Washing machines", "Microprocessors", "Mechanical tools", "Power transformers"], a: 1 },
-            { cat: "Applications & Career", q: "Which field offers career opportunities related to VLSI?", o: ["IC design", "Chip fabrication", "Semiconductor testing", "All of the above"], a: 3 },
-            { cat: "Verilog & Modeling", q: "Which modeling style uses logic gates directly?", o: ["Behavioral", "Structural", "Gate-level", "Dataflow"], a: 2 },
-            { cat: "Verilog & Modeling", q: "Behavioral modeling mainly uses", o: ["Gate primitives", "always blocks", "Module instantiation", "Transistors"], a: 1 },
-            { cat: "Verilog & Modeling", q: "Structural modeling represents", o: ["Algorithmic behavior", "Truth table", "Interconnection of modules", "Timing waveform"], a: 2 },
-            { cat: "Verilog & Modeling", q: "Verilog is mainly used for", o: ["PCB design", "Hardware description", "Mechanical simulation", "Power analysis"], a: 1 },
-            { cat: "Adders", q: "A half adder has", o: ["1 input and 1 output", "2 inputs and 2 outputs", "3 inputs and 2 outputs", "2 inputs and 1 output"], a: 1 },
-            { cat: "Adders", q: "Outputs of a half adder are", o: ["Sum and Borrow", "Carry and Borrow", "Sum and Carry", "Difference and Carry"], a: 2 },
-            { cat: "Adders", q: "A full adder has", o: ["Two inputs", "Three inputs", "One output", "Four inputs"], a: 1 },
-            { cat: "Adders", q: "A full adder can be built using", o: ["One half adder", "Two half adders and one OR gate", "Two XOR gates only", "One AND gate"], a: 1 },
-            { cat: "Combinational Circuits", q: "Combinational circuits depend on", o: ["Past inputs", "Clock signal", "Present inputs only", "Memory elements"], a: 2 },
-            { cat: "Combinational Circuits", q: "Which of the following is NOT a combinational circuit?", o: ["Multiplexer", "Decoder", "Flip-flop", "Encoder"], a: 2 },
-            { cat: "Combinational Circuits", q: "Combinational circuits are mainly used for", o: ["Storage", "Data selection and routing", "Synchronization", "Timing control"], a: 1 },
-            { cat: "Multiplexer (MUX)", q: "A multiplexer is used to", o: ["Distribute data", "Select data", "Store data", "Amplify data"], a: 1 },
-            { cat: "Multiplexer (MUX)", q: "A 4:1 multiplexer requires how many select lines?", o: ["1", "2", "3", "4"], a: 1 },
-            { cat: "Demultiplexer (DEMUX)", q: "A demultiplexer performs", o: ["Many-to-one operation", "One-to-many operation", "Encoding", "Decoding"], a: 1 },
-            { cat: "Demultiplexer (DEMUX)", q: "DEMUX is mainly used for", o: ["Data storage", "Data distribution", "Arithmetic operation", "Code conversion"], a: 1 },
-            { cat: "Decoder & Encoder", q: "A decoder converts", o: ["Many inputs into one output", "Binary input into one active output", "One input into binary output", "Analog to digital"], a: 1 },
-            { cat: "Decoder & Encoder", q: "The reverse operation of a decoder is", o: ["Multiplexer", "Demultiplexer", "Encoder", "Adder"], a: 2 },
-            { cat: "Decoder & Encoder", q: "A priority encoder is used when", o: ["Only one input is active", "Multiple inputs are active", "No inputs are active", "Inputs are sequential"], a: 1 },
+            // Section 1: Verilog Basics
+            { cat: "Verilog Basics", q: "Which keyword is used to start a Verilog module?", o: ["function", "module", "block", "define"], a: 1 },
+            { cat: "Verilog Basics", q: "Which keyword ends a module?", o: ["end", "finish", "endmodule", "stop"], a: 2 },
+            { cat: "Verilog Basics", q: "Which data type represents a connection between modules?", o: ["reg", "wire", "integer", "real"], a: 1 },
+            { cat: "Verilog Basics", q: "Which block executes continuously when signals change?", o: ["initial", "always", "assign", "case"], a: 1 },
+            { cat: "Verilog Basics", q: "Continuous assignment uses which keyword?", o: ["always", "assign", "begin", "case"], a: 1 },
+            
+            // Section 2: Verilog – Adder
+            { cat: "Verilog – Adder", q: "What does this code represent?\n\nassign sum = a ^ b;\nassign carry = a & b;", o: ["Half Adder", "Full Adder", "Half Subtractor", "Decoder"], a: 0 },
+            { cat: "Verilog – Adder", q: "What does this code implement?\n\nassign sum = a ^ b ^ cin;\nassign cout = (a & b) | (b & cin) | (a & cin);", o: ["Half Adder", "Full Adder", "Half Subtractor", "Encoder"], a: 1 },
+            { cat: "Verilog – Adder", q: "A Full Adder has how many inputs?", o: ["2", "3", "4", "5"], a: 1 },
+
+            // Section 3: Subtractor
+            { cat: "Subtractor", q: "What does this code represent?\n\nassign diff = a ^ b;\nassign borrow = ~a & b;", o: ["Half Subtractor", "Full Subtractor", "Adder", "Decoder"], a: 0 },
+            { cat: "Subtractor", q: "If a=0 and b=1, what is the output?\n\ndiff = a ^ b\nborrow = ~a & b", o: ["diff=1 borrow=1", "diff=0 borrow=1", "diff=1 borrow=0", "diff=0 borrow=0"], a: 0 },
+
+            // Section 4: Multiplexer
+            { cat: "Multiplexer", q: "What does the following code represent?\n\nassign y = s ? b : a;", o: ["Multiplexer", "Demultiplexer", "Encoder", "Decoder"], a: 0 },
+            { cat: "Multiplexer", q: "If s=0, what will be the output?", o: ["a", "b", "1", "0"], a: 0 },
+
+            // Section 5: Demultiplexer
+            { cat: "Demultiplexer", q: "What does the following code represent?\n\nassign y0 = ~s & d;\nassign y1 = s & d;", o: ["2:1 MUX", "1:2 DEMUX", "Decoder", "Encoder"], a: 1 },
+            { cat: "Demultiplexer", q: "If d=1 and s=1, output will be:", o: ["y0=1 y1=0", "y0=0 y1=1", "y0=1 y1=1", "y0=0 y1=0"], a: 1 },
+
+            // Section 6: Encoder
+            { cat: "Encoder", q: "What does this code represent?\n\nif(i0) y = 2'b00;\nelse if(i1) y = 2'b01;\nelse if(i2) y = 2'b10;\nelse if(i3) y = 2'b11;", o: ["Decoder", "Encoder", "MUX", "DEMUX"], a: 1 },
+            { cat: "Encoder", q: "A 4-to-2 encoder has:", o: ["4 inputs and 2 outputs", "2 inputs and 4 outputs", "3 inputs and 8 outputs", "8 inputs and 3 outputs"], a: 0 },
+
+            // Section 7: Decoder
+            { cat: "Decoder", q: "What does this code represent?\n\nassign y0 = ~a & ~b;\nassign y1 = ~a & b;\nassign y2 = a & ~b;\nassign y3 = a & b;", o: ["4-to-2 Encoder", "2-to-4 Decoder", "MUX", "DEMUX"], a: 1 },
+            { cat: "Decoder", q: "If a=1 and b=0, which output becomes 1?", o: ["y0", "y1", "y2", "y3"], a: 2 },
+
+            // Section 8: Flip-Flops
+            { cat: "Flip-Flops", q: "What does this code represent?\n\nalways @(posedge clk)\nq <= d;", o: ["D Flip-Flop", "T Flip-Flop", "JK Flip-Flop", "Latch"], a: 0 },
+            { cat: "Flip-Flops", q: "What does this code represent?\n\nalways @(posedge clk)\nq <= t ^ q;", o: ["D Flip-Flop", "T Flip-Flop", "JK Flip-Flop", "SR Flip-Flop"], a: 1 },
+            { cat: "Flip-Flops", q: "In JK Flip-Flop, when J=K=1:", o: ["Reset", "Set", "Toggle", "Hold"], a: 2 },
+
+            // Section 9: Find the Bug in Verilog Code
+            { cat: "Find the Bug in Verilog Code", q: "Identify the bug\n\nassign y = a && b;", o: ["Syntax error", "Wrong operator", "Missing input", "No error"], a: 1 },
+            { cat: "Find the Bug in Verilog Code", q: "Identify the bug\n\nalways @(*)\nbegin\ny = a;\nend\n\nOutput declared as:\noutput y;", o: ["No issue", "y must be reg", "always block wrong", "assign required"], a: 1 },
+            { cat: "Find the Bug in Verilog Code", q: "Identify the bug\n\nalways @(posedge clk)\nq = d;", o: ["Should use <=", "Should use assign", "clk wrong", "No error"], a: 0 },
+
+            // Section 10: Testbench Questions
+            { cat: "Testbench Questions", q: "What is the purpose of a testbench?", o: ["Synthesis", "Fabrication", "Verification", "Routing"], a: 2 },
+            { cat: "Testbench Questions", q: "Which block is mainly used in testbench to apply inputs?", o: ["always", "initial", "assign", "module"], a: 1 },
+            { cat: "Testbench Questions", q: "$finish command does:", o: ["Start simulation", "Stop simulation", "Display waveform", "Reset module"], a: 1 },
+
+            // Section 11: Blocking vs Non-Blocking Assignment
+            { cat: "Blocking vs Non-Blocking Assignment", q: "In Verilog, = represents:", o: ["Non-blocking assignment", "Blocking assignment", "Comparison", "Continuous assignment"], a: 1 },
+            { cat: "Blocking vs Non-Blocking Assignment", q: "In Verilog, <= represents:", o: ["Blocking assignment", "Non-blocking assignment", "Comparison", "Logical operator"], a: 1 },
+            { cat: "Blocking vs Non-Blocking Assignment", q: "Non-blocking assignment is mainly used for:", o: ["Combinational circuits", "Sequential circuits", "Testbench only", "Encoders"], a: 1 }
         ];
         const TOTAL = QS.length, SECS = 20 * 60, LBL = ['A', 'B', 'C', 'D'];
 
